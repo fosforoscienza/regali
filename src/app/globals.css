@@ -4,27 +4,32 @@
 /* Design tokens — sobri, in stile Apple                               */
 /* ------------------------------------------------------------------ */
 :root {
-  --bg: #f5f5f7;
-  --surface: #ffffff;
-  --surface-2: #f2f2f4;
-  --fill: rgba(120, 120, 128, 0.12);
-  --fill-strong: rgba(120, 120, 128, 0.2);
-  --text: #1d1d1f;
-  --text-2: #6e6e73;
-  --text-3: #a1a1a6;
-  --separator: rgba(60, 60, 67, 0.12);
+  /* Chiaro: sfondo crema, superfici calde */
+  --bg: #f6f1e7;
+  --surface: #fffdf8;
+  --surface-2: #f1ebdf;
+  --fill: rgba(120, 98, 66, 0.1);
+  --fill-strong: rgba(120, 98, 66, 0.2);
+  --text: #2a251f;
+  --text-2: #776e62;
+  --text-3: #aba293;
+  --separator: rgba(90, 70, 40, 0.14);
   --accent: #0071e3;
   --accent-press: #006edb;
   --accent-soft: rgba(0, 113, 227, 0.1);
-  --success: #248a3d;
-  --success-soft: rgba(52, 199, 89, 0.14);
-  --danger: #d70015;
-  --danger-soft: rgba(255, 59, 48, 0.1);
-  --material: rgba(255, 255, 255, 0.72);
-  --material-edge: rgba(255, 255, 255, 0.6);
-  --scrim: rgba(0, 0, 0, 0.28);
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.02);
-  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --success: #2f7d3a;
+  --success-soft: rgba(52, 160, 80, 0.14);
+  --danger: #c4161c;
+  --danger-soft: rgba(220, 50, 40, 0.1);
+  --material: rgba(255, 252, 245, 0.74);
+  --material-edge: rgba(255, 255, 255, 0.7);
+  --scrim: rgba(40, 30, 15, 0.28);
+  --shadow-sm: 0 1px 2px rgba(70, 50, 20, 0.05), 0 1px 1px rgba(70, 50, 20, 0.03);
+  --shadow-lg: 0 10px 40px rgba(70, 50, 20, 0.14), 0 2px 8px rgba(70, 50, 20, 0.06);
+  --segment-on: var(--surface);
+  --avatar-fg: 45% 32%;
+  --avatar-bg-1: 70% 90%;
+  --avatar-bg-2: 55% 82%;
   --radius: 18px;
   --radius-sm: 12px;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -32,8 +37,9 @@
   color-scheme: light;
 }
 
+/* Scuro: automatico (se il sistema è scuro e non è stato scelto "Chiaro") o scelto a mano */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
     --bg: #000000;
     --surface: #1c1c1e;
     --surface-2: #2c2c2e;
@@ -55,8 +61,45 @@
     --scrim: rgba(0, 0, 0, 0.5);
     --shadow-sm: none;
     --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.5);
+    --segment-on: #636366;
+    --avatar-fg: 70% 88%;
+    --avatar-bg-1: 30% 38%;
+    --avatar-bg-2: 30% 28%;
     color-scheme: dark;
   }
+}
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --surface: #1c1c1e;
+  --surface-2: #2c2c2e;
+  --fill: rgba(120, 120, 128, 0.24);
+  --fill-strong: rgba(120, 120, 128, 0.36);
+  --text: #f5f5f7;
+  --text-2: #98989d;
+  --text-3: #636366;
+  --separator: rgba(84, 84, 88, 0.6);
+  --accent: #0a84ff;
+  --accent-press: #0077ed;
+  --accent-soft: rgba(10, 132, 255, 0.18);
+  --success: #30d158;
+  --success-soft: rgba(48, 209, 88, 0.18);
+  --danger: #ff453a;
+  --danger-soft: rgba(255, 69, 58, 0.16);
+  --material: rgba(30, 30, 32, 0.72);
+  --material-edge: rgba(255, 255, 255, 0.08);
+  --scrim: rgba(0, 0, 0, 0.5);
+  --shadow-sm: none;
+  --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.5);
+  --segment-on: #636366;
+  --avatar-fg: 70% 88%;
+  --avatar-bg-1: 30% 38%;
+  --avatar-bg-2: 30% 28%;
+  color-scheme: dark;
+}
+
+/* Passaggio morbido tra chiaro e scuro */
+body {
+  transition: background-color 300ms ease-out, color 300ms ease-out;
 }
 
 @theme inline {
@@ -399,16 +442,11 @@ select.input.input-compact {
   pointer-events: none;
 }
 .segmented label:has(input:checked) {
-  background: var(--surface);
+  background: var(--segment-on);
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12), 0 3px 1px rgba(0, 0, 0, 0.04);
 }
 .segmented label:has(input:focus-visible) {
   outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
-}
-@media (prefers-color-scheme: dark) {
-  .segmented label:has(input:checked) {
-    background: #636366;
-  }
 }
 
 /* Chip selezionabili */
@@ -456,14 +494,8 @@ select.input.input-compact {
   font-weight: 600;
   font-size: calc(var(--size, 2.5rem) * 0.38);
   letter-spacing: 0;
-  color: hsl(var(--h) 45% 32%);
-  background: linear-gradient(180deg, hsl(var(--h) 70% 90%), hsl(var(--h) 55% 82%));
-}
-@media (prefers-color-scheme: dark) {
-  .avatar {
-    color: hsl(var(--h) 70% 88%);
-    background: linear-gradient(180deg, hsl(var(--h) 30% 38%), hsl(var(--h) 30% 28%));
-  }
+  color: hsl(var(--h) var(--avatar-fg));
+  background: linear-gradient(180deg, hsl(var(--h) var(--avatar-bg-1)), hsl(var(--h) var(--avatar-bg-2)));
 }
 
 /* ------------------------------------------------------------------ */

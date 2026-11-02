@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { logout } from "@/app/actions";
 import { requireUser } from "@/lib/auth";
 import { listPeople } from "@/lib/data";
 import { formatDateLong } from "@/lib/format";
+import { THEME_COOKIE, parseTheme } from "@/lib/theme";
+import { ThemePicker } from "@/components/ThemePicker";
 import { Avatar } from "@/components/Avatar";
 import { CreateAccountButton, PasswordForm } from "@/components/AccountForms";
 import { ShareButton } from "@/components/ShareButton";
@@ -13,6 +16,7 @@ export const metadata = { title: "Account · Regali" };
 export default async function AccountPage() {
   const me = await requireUser();
   const people = await listPeople();
+  const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
 
   return (
     <>
@@ -31,6 +35,16 @@ export default async function AccountPage() {
             </p>
           </div>
         </div>
+
+        <section>
+          <h2 className="t-section">Aspetto</h2>
+          <div className="card p-4">
+            <ThemePicker initial={theme} />
+            <p className="t-caption mt-3 px-1">
+              Automatico segue le impostazioni del dispositivo. La scelta vale solo su questo dispositivo.
+            </p>
+          </div>
+        </section>
 
         <section>
           <h2 className="t-section">Password</h2>
