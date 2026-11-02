@@ -24,6 +24,8 @@ export async function GET(_req: Request, ctx: RouteContext<"/api/foto/[id]">) {
     headers: {
       "Content-Type": row.photo_type ?? "image/jpeg",
       "Cache-Control": "private, max-age=31536000, immutable",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'none'; sandbox",
     },
   });
 }

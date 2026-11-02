@@ -171,6 +171,11 @@ export function GiftForm({ gift, recipientId, formId, onSaved }: Props) {
             Aggiungi una foto
           </label>
         )}
+        {!preview && !removePhoto && (
+          <p className="t-caption mt-2 px-1">
+            Se non aggiungi una foto, proviamo a prenderla dal link.
+          </p>
+        )}
       </div>
 
       <button type="submit" className="btn btn-primary btn-block" disabled={pending}>

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { createSession, destroySession, normalizeUsername, requireUser } from "@/lib/auth";
 import { query } from "@/lib/db";
 import { canSee, getGift, getPerson, isUuid } from "@/lib/data";
+import { IMAGE_TYPES, fetchImageFromLink } from "@/lib/linkImage";
 import type { ActionState, Occasion } from "@/lib/types";
 
 const str = (fd: FormData, key: string) => {
@@ -176,16 +177,28 @@ export async function saveGift(_: ActionState, fd: FormData): Promise<ActionStat
   let photoBuf: Buffer | null = null;
   let photoType: string | null = null;
   if (photo instanceof File && photo.size > 0) {
-    if (!photo.type.startsWith("image/")) return { error: "Il file deve essere un'immagine." };
+    if (![...IMAGE_TYPES, "image/heic", "image/heif"].includes(photo.type))
+      return { error: "Formato non supportato: usa una foto JPEG, PNG o WebP." };
     if (photo.size > MAX_PHOTO) return { error: "La foto è troppo grande (max 3 MB)." };
     photoBuf = Buffer.from(await photo.arrayBuffer());
     photoType = photo.type;
   }
 
+  // Nessuna foto caricata: proviamo a prenderla dal link (se la foto non è stata tolta di proposito)
+  const tryLinkImage = async () => {
+    if (photoBuf || removePhoto || !link) return;
+    const img = await fetchImageFromLink(link);
+    if (img) {
+      photoBuf = img.data;
+      photoType = img.type;
+    }
+  };
+
   if (id) {
     const gift = await getGift(id);
     if (!gift) return { error: "Regalo non trovato." };
     if (gift.author_id !== me.id) return { error: "Puoi modificare solo ciò che hai aggiunto tu." };
+    if (!gift.has_photo) await tryLinkImage();
     await query(
       `update gifts set title = $1, notes = $2, link = $3, price = $4,
          photo = case when $5::bytea is not null then $5::bytea when $7 then null else photo end,
@@ -201,6 +214,7 @@ export async function saveGift(_: ActionState, fd: FormData): Promise<ActionStat
   const recipientId = str(fd, "recipient_id") || me.id;
   const recipient = await getPerson(recipientId);
   if (!recipient) return { error: "Scegli per chi è il regalo." };
+  await tryLinkImage();
 
   const [row] = await query<{ id: string }>(
     `insert into gifts (recipient_id, author_id, title, notes, link, price, photo, photo_type)
