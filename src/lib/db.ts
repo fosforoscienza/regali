@@ -63,6 +63,11 @@ create table if not exists gifts (
 
 create index if not exists gifts_recipient_idx on gifts (recipient_id);
 create index if not exists gifts_done_idx on gifts (done_at) where done_at is not null;
+
+-- Su Supabase le tabelle sono esposte dall'API pubblica: la RLS senza policy la chiude.
+-- L'app si collega come proprietaria delle tabelle, quindi non ne è limitata.
+alter table users enable row level security;
+alter table gifts enable row level security;
 `;
 
 const SEED = [
