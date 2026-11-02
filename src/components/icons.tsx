@@ -123,3 +123,10 @@ export const IconKey = (p: P) => (
     <path d="M10.8 12.2L19 4M16 7l2.5 2.5M14 9l2 2" />
   </Svg>
 );
+
+export const IconPaste = (p: P) => (
+  <Svg {...p}>
+    <rect x="5.5" y="4.5" width="13" height="16" rx="2" />
+    <path d="M9 4.5V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v.5a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1ZM9 11h6M9 15h4" />
+  </Svg>
+);

@@ -263,12 +263,19 @@ async function fetchAmazonImage(start: URL, signal: AbortSignal) {
     }
   }
   if (!res.ok || !mediaType(res).includes("html")) {
+    console.warn(`Amazon: pagina non disponibile (stato ${res.status}) per ${asin ?? url.pathname}`);
     await res.body?.cancel();
     return null;
   }
   const html = (await readLimited(res, 3_000_000, true)).toString("utf8");
   const candidate = amazonImageFromHtml(html) ?? findImageCandidates(html)[0];
-  if (!candidate) return null;
+  if (!candidate) {
+    const blocked = /captcha|api-services-support/i.test(html);
+    console.warn(
+      `Amazon: ${blocked ? "pagina bloccata dal controllo anti-bot" : "immagine non trovata nella pagina"} per ${asin ?? url.pathname}`,
+    );
+    return null;
+  }
   return downloadImage(new URL(candidate, url), signal);
 }
 
@@ -309,7 +316,8 @@ export async function fetchImageFromLink(
       }
     }
     return null;
-  } catch {
+  } catch (e) {
+    console.warn(`Foto dal link non recuperata: ${(e as Error).message}`);
     return null;
   } finally {
     clearTimeout(timer);

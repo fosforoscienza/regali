@@ -184,6 +184,19 @@ export async function saveGift(_: ActionState, fd: FormData): Promise<ActionStat
     photoType = photo.type;
   }
 
+  // Indirizzo di un'immagine incollato al posto del file
+  const pastedUrl = parseLink(str(fd, "photo_url"));
+  if (!photoBuf && pastedUrl && pastedUrl !== "invalid") {
+    const img = await fetchImageFromLink(pastedUrl);
+    if (!img)
+      return {
+        error:
+          "Non riesco a scaricare la foto da quell'indirizzo. Prova a copiare l'immagine stessa invece del suo indirizzo.",
+      };
+    photoBuf = img.data;
+    photoType = img.type;
+  }
+
   // Nessuna foto caricata: proviamo a prenderla dal link (se la foto non è stata tolta di proposito)
   const tryLinkImage = async () => {
     if (photoBuf || removePhoto || !link) return;
@@ -191,6 +204,8 @@ export async function saveGift(_: ActionState, fd: FormData): Promise<ActionStat
     if (img) {
       photoBuf = img.data;
       photoType = img.type;
+    } else {
+      console.warn(`Foto non trovata per il link ${new URL(link).hostname}`);
     }
   };
 
