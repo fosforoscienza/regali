@@ -24,10 +24,19 @@ export async function login(_: ActionState, fd: FormData): Promise<ActionState> 
   const password = str(fd, "password");
   if (!username || !password) return { error: "Inserisci nome e password." };
 
-  const rows = await query<{ id: string; password_hash: string }>(
-    "select id, password_hash from users where username = $1",
-    [username],
-  );
+  let rows: { id: string; password_hash: string }[];
+  try {
+    rows = await query<{ id: string; password_hash: string }>(
+      "select id, password_hash from users where username = $1",
+      [username],
+    );
+  } catch (e) {
+    console.error("Errore di connessione al database:", e);
+    return {
+      error:
+        "Il server non riesce a collegarsi al database. Controlla la variabile DATABASE_URL su Vercel.",
+    };
+  }
   const user = rows[0];
   const ok = user ? await bcrypt.compare(password, user.password_hash) : false;
   if (!user || !ok) return { error: "Nome o password non corretti." };

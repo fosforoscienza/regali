@@ -6,8 +6,25 @@ import bcrypt from "bcryptjs";
 types.setTypeParser(1082, (v) => v);
 types.setTypeParser(1700, (v) => (v === null ? null : parseFloat(v)));
 
-const connectionString =
-  process.env.DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/regali";
+const rawConnectionString = (
+  process.env.DATABASE_URL ??
+  process.env.POSTGRES_URL ??
+  "postgres://postgres:postgres@localhost:5432/regali"
+).trim();
+
+// Se la stringa contiene "sslmode=...", pg la usa al posto della nostra configurazione SSL
+// e rifiuta il certificato di Supabase ("self-signed certificate"): la togliamo.
+function stripSslParams(url: string) {
+  try {
+    const u = new URL(url);
+    for (const k of ["sslmode", "ssl", "sslrootcert", "sslcert", "sslkey"]) u.searchParams.delete(k);
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+const connectionString = stripSslParams(rawConnectionString);
 
 function isLocal(url: string) {
   return /@(localhost|127\.0\.0\.1)(:|\/)/.test(url);
