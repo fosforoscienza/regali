@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Regali
 
-## Getting Started
+Webapp per la lista dei desideri condivisa della famiglia: wishlist personali, suggerimenti
+di regalo per gli altri (che il destinatario non vede) e uno storico di chi ha regalato cosa.
 
-First, run the development server:
+## Funzioni
+
+- **Accesso con nome e password.** La prima volta la password è il nome in minuscolo
+  (es. `lorenzo`); si cambia dalla scheda *Account*.
+- **Account iniziali:** Lorenzo (7/10/1992) ed Enrica (3/7/1993), entrambi amministratori.
+  Vengono creati automaticamente al primo avvio.
+- **Chiunque può creare nuovi account** (nome + data di nascita), visibili a tutti.
+- **Amministratori:** possono eliminare gli account non amministratori e reimpostarne la password.
+- **La mia wishlist:** aggiungi ciò che vorresti ricevere, con foto, link, prezzo e note.
+  Qui vedi e modifichi solo ciò che hai aggiunto tu.
+- **Suggerisci un regalo:** scegli un'altra persona e annota un'idea. Il destinatario non la vede.
+- **Profilo di una persona:** i suoi desideri + i suggerimenti di tutti.
+- **Segna come regalato:** chi l'ha fatto, l'occasione (Natale, compleanno, altro) e l'anno.
+- **Storico:** tabella unica di tutti i regali fatti, filtrabile per persona, occasione e anno.
+- **Condividi:** pulsante che invia il link dell'app (Web Share API o copia negli appunti).
+
+## Tecnologia
+
+Next.js 16 (App Router, Server Actions), Postgres (`pg`), sessioni firmate in cookie (`jose`),
+password con `bcryptjs`. Le foto vengono ridimensionate nel browser e salvate nel database.
+Lo schema viene creato automaticamente al primo accesso al database.
+
+Lo stile segue le linee guida della skill `apple-design` (in `.claude/skills/apple-design`):
+font di sistema, materiali traslucidi, sheet con trascinamento per chiudere, feedback alla
+pressione, supporto a dark mode, reduced motion e reduced transparency.
+
+## Sviluppo locale
 
 ```bash
+cp .env.example .env.local   # imposta DATABASE_URL e SESSION_SECRET
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Pubblicazione
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Crea un database Postgres (es. Supabase o Neon) e copia la stringa di connessione
+   (su Supabase usa il *Transaction pooler*, porta 6543).
+2. Importa il repository su Vercel e imposta le variabili d'ambiente `DATABASE_URL` e
+   `SESSION_SECRET` (una stringa casuale lunga).
+3. Al primo accesso vengono create le tabelle e gli account di Lorenzo ed Enrica.

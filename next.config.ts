@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  experimental: {
+    serverActions: {
+      // Le foto vengono ridimensionate nel browser, ma lasciamo margine
+      bodySizeLimit: "4mb",
+    },
+  },
+  serverExternalPackages: ["pg"],
 };
 
 export default nextConfig;
